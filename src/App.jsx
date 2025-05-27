@@ -1,14 +1,11 @@
 import "./App.css";
-import Dashboard from "./pages/Dashboard";
-
-// import HomePages from "./pages/HomePages";
 import Transaction from "./pages/Transaction";
 
 function App() {
   return (
     <>
-      {/* <HomePages /> */}
-      {/* <Dashboard /> */}
+      <h1 class="text-sm underline italic mb-4">Hello world!</h1>
+
       <Transaction />
     </>
   );

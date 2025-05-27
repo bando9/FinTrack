@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function Transaction() {
   const today = new Date().toDateString();
@@ -69,7 +69,6 @@ export default function Transaction() {
           <input type="text" />
         </div>
         <div>
-          {/* <input type="date" /> */}
           <input placeholder={today} type="date" />
         </div>
         <div>
