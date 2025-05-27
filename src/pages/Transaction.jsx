@@ -39,58 +39,60 @@ export default function Transaction() {
   };
 
   return (
-    <div>
-      <h1>Transaction</h1>
-      <form action="#" onSubmit={addTransaction}>
-        <div>
-          <label htmlFor="category">Kategori </label>
-          <input
-            type="text"
-            id="category"
-            // onChange={(e) => setCategory(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="rek">Rekening </label>
-          <select>
-            <option>Pilih Rekening</option>
-            <option value="CIMB Niaga">CIMB Niaga</option>
-            <option value="BRI">BRI</option>
-            <option value="Jago">Jago</option>
-            <option value="Gopay">Gopay</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="jumlah">Jumlah </label>
-          <input type="number" />
-        </div>
-        <div>
-          <label htmlFor="catatan">Catatan </label>
-          <input type="text" />
-        </div>
-        <div>
-          <input placeholder={today} type="date" />
-        </div>
-        <div>
-          <input type="time" />
-        </div>
-        <button type="submit">Simpan</button>
-      </form>
+    <div className="w-1/2 flex m-auto bg-amber-300 rounded-2xl">
+      <div className="text-center m-auto mt-10">
+        <h1 className="text-4xl underline mb-3">Transaction</h1>
+        <form action="#" onSubmit={addTransaction}>
+          <div>
+            <label htmlFor="category">Kategori </label>
+            <input
+              type="text"
+              id="category"
+              // onChange={(e) => setCategory(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="rek">Rekening </label>
+            <select>
+              <option>Pilih Rekening</option>
+              <option value="CIMB Niaga">CIMB Niaga</option>
+              <option value="BRI">BRI</option>
+              <option value="Jago">Jago</option>
+              <option value="Gopay">Gopay</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="jumlah">Jumlah </label>
+            <input type="number" />
+          </div>
+          <div>
+            <label htmlFor="catatan">Catatan </label>
+            <input type="text" />
+          </div>
+          <div>
+            <input placeholder={today} type="date" />
+          </div>
+          <div>
+            <input type="time" />
+          </div>
+          <button type="submit">Simpan</button>
+        </form>
 
-      <ul>
-        <h3>Masuk</h3>
-        {category && <li>{category}</li>}
-        {rekening && <li>{rekening}</li>}
-        {jumlah && <li>{jumlah}</li>}
+        <ul>
+          <h3 className="text-2xl mt-7 mb-3">Balance</h3>
+          {category && <li>{category}</li>}
+          {rekening && <li>{rekening}</li>}
+          {jumlah && <li>{jumlah}</li>}
 
-        {catatan && <li>{catatan}</li>}
-        {timestamp && (
-          <li>
-            {timestamp}
-            {appt && `, ${appt}`}
-          </li>
-        )}
-      </ul>
+          {catatan && <li>{catatan}</li>}
+          {timestamp && (
+            <li>
+              {timestamp}
+              {appt && `, ${appt}`}
+            </li>
+          )}
+        </ul>
+      </div>
     </div>
   );
 }
