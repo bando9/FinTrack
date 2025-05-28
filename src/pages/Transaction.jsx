@@ -1,148 +1,72 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export default function Transaction() {
-  const today = new Date().toDateString();
+  // const today = new Date().toDateString();
 
-  const [category, setCategory] = useState("");
-  const [rekening, setRekening] = useState("");
-  const [jumlah, setJumlah] = useState("");
-  const [catatan, setCatatan] = useState("");
-  const [timestamp, setTimestamp] = useState("");
-  const [appt, setAppt] = useState("");
+  const [transactions, setTransactions] = useState([]);
 
-  const addTransaction = (e) => {
-    e.preventDefault();
-    console.log("tambah transaksi");
-    console.log(e.target[0].value);
-    setCategory(e.target[0].value);
+  const { register, handleSubmit } = useForm();
 
-    console.log(e.target[1].value);
-    setRekening(e.target[1].value);
+  const onSubmit = (data, e) => {
+    const newTransaction = {
+      id: Date.now(),
+      category: data.category,
+      rekening: data.rekening,
+    };
 
-    console.log(e.target[2].value);
-    setJumlah(e.target[2].value);
-
-    console.log(e.target[3].value);
-    setCatatan(e.target[3].value);
-
-    console.log(e.target[4].value);
-    setTimestamp(e.target[4].value);
-
-    console.log(e.target[5].value);
-    setAppt(e.target[5].value);
-    e.target[0].value = "";
-    e.target[1].value = "";
-    e.target[2].value = "";
-    e.target[3].value = "";
-    e.target[4].value = "";
-    e.target[5].value = "";
+    setTransactions((prev) => [...prev, newTransaction]);
+    e.target.reset();
   };
 
   return (
-    <div className="w-1/2 flex m-auto bg-amber-300 rounded-2xl pb-10">
-      <div className="text-center m-auto mt-10">
-        <h1 className="text-4xl underline mb-3">Transaction</h1>
-        <form action="#" onSubmit={addTransaction}>
-          <div>
-            <label htmlFor="category">Kategori </label>
+    <div className="w-1/2 flex m-auto bg-amber-300 rounded-2xl pb-10 mt-10">
+      <div className=" m-auto mt-10">
+        <h1 className="text-4xl underline mb-4 text-center">Transaction</h1>
+        <form
+          className="flex flex-col gap-1.5"
+          action="#"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <label className="bg-amber-200 p-2 rounded-md">
+            Kategori :{" "}
             <input
               type="text"
-              id="category"
-              // onChange={(e) => setCategory(e.target.value)}
+              {...register("category")}
+              className="focus:outline-offset-0 focus:outline-none"
             />
-          </div>
-          <div>
-            <label htmlFor="rek">Rekening </label>
-            <select>
+          </label>
+
+          <label className="bg-amber-200 p-2 rounded-md">
+            Rekening:{" "}
+            <select {...register("rekening")} className="px-2">
               <option>Pilih Rekening</option>
               <option value="CIMB Niaga">CIMB Niaga</option>
               <option value="BRI">BRI</option>
               <option value="Jago">Jago</option>
               <option value="Gopay">Gopay</option>
             </select>
-          </div>
-          <div>
-            <label htmlFor="jumlah">Jumlah </label>
-            <input type="number" />
-          </div>
-          <div>
-            <label htmlFor="catatan">Catatan </label>
-            <input type="text" />
-          </div>
-          <div>
-            <input placeholder={today} type="date" />
-          </div>
-          <div>
-            <input type="time" />
-          </div>
-          <button type="submit">Simpan</button>
-        </form>
-        <h3 className="text-2xl mt-7 mb-3">Riwayat</h3>
-        {category ? (
-          <ul>
-            {category && <li>{category}</li>}
-            {rekening && <li>{rekening}</li>}
-            {jumlah && <li>{jumlah}</li>}
+          </label>
 
-            {catatan && <li>{catatan}</li>}
-            {timestamp && (
-              <li>
-                {timestamp}
-                {appt && `, ${appt}`}
-              </li>
-            )}
-          </ul>
+          <button className="px-3 py-1 bg-amber-100 rounded-lg w-1/2 mx-auto mt-2 cursor-pointer">
+            Simpan
+          </button>
+        </form>
+
+        <h3 className="text-2xl mt-7 mb-3">Riwayat</h3>
+        {transactions.length > 0 ? (
+          transactions.map((item) => {
+            return (
+              <div key={item.id} className="mt-2 bg-amber-200 p-2 rounded-sm">
+                <p>Kategori: {item.category}</p>
+                <p>Rekening {item.rekening}</p>
+              </div>
+            );
+          })
         ) : (
           <p className="text-gray-500">Belum ada riwayat</p>
         )}
-        <Balance />
       </div>
     </div>
   );
-}
-
-function Balance() {
-  const income = 3500000;
-  const expense = 2500000;
-  const total = income - expense;
-
-  return (
-    <div className="bg-amber-200 m-10 rounded-4xl p-4">
-      <div className="mb-5">
-        <h1 className=" text-xl mb-2 font-semibold underline">Balance</h1>
-        <p>
-          Pemasukan: <CurrentDisplay amount={income} />
-        </p>
-        <p>
-          Pengeluaran: <CurrentDisplay amount={expense} />
-        </p>
-        <p>
-          Total saldo: <CurrentDisplay amount={total} />
-        </p>
-      </div>
-
-      <h1 className=" text-xl mb-3 font-semibold underline">
-        Riwayat Transaksi
-      </h1>
-
-      <div className="text-left bg-amber-100 px-2 rounded-xl">
-        <p>Beli Bensin</p>
-        <p>
-          <CurrentDisplay amount={20000} />{" "}
-        </p>
-        <p>Rek: cash fiat</p>
-        <p>Selasa, 27 Mei 2025. 19:20</p>
-      </div>
-    </div>
-  );
-}
-
-function CurrentDisplay({ amount }) {
-  const formatter = new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  });
-
-  return <span>{formatter.format(amount)}</span>;
 }
