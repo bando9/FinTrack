@@ -12,3 +12,10 @@ select {
   /* text-indent: 3px; */
   /* text-overflow: ""; */
 }
+
+table,
+th,
+td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
