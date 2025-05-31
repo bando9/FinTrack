@@ -1,47 +1,54 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNotifications } from "@toolpad/core/useNotifications";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import CurrentDisplay from "../components/ui/CurrentDisplay";
 
 export default function Transaction() {
   const notifications = useNotifications();
 
-  const [transactions, setTransactions] = useState([]);
   const { register, handleSubmit } = useForm();
+
+  const [history, setHistory] = useState(() => {
+    // Load data if it exist
+    const savedData = localStorage.getItem("transactionHistory");
+    return savedData ? JSON.parse(savedData) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("transactionHistory", JSON.stringify(history));
+  }, [history]);
 
   const onSubmit = (data, e) => {
     const newTransaction = {
       id: Date.now(),
       category: data.category,
       rekening: data.rekening,
-      jumlah: data.jumlah,
+      jumlah: Number(data.jumlah),
     };
 
-    setTransactions((prev) => [...prev, newTransaction]);
+    setHistory((prev) => [...prev, newTransaction]);
+
     e.target.reset();
   };
 
+  const deleteTransaction = (id) => {
+    setHistory((prev) => prev.filter((item) => item.id !== id));
+  };
+
   return (
-    <div className="w-1/2 flex m-auto bg-amber-300 rounded-2xl pb-10 mt-10">
-      <div className=" m-auto mt-10">
+    <div className="w-3/4 m-auto bg-amber-300 rounded-2xl pb-10 mt-10">
+      <div className="container m-auto mt-10 p-2 w-3/4">
         <h1 className="text-4xl underline mb-4 text-center">Transaction</h1>
         <form
           className="flex flex-col gap-1.5"
           action="#"
           onSubmit={handleSubmit(onSubmit)}
         >
-          {/* <label className="bg-amber-200 p-2 rounded-md">
-            Kategori :{" "}
-            <input
-              type="text"
-              {...register("category")}
-              className="focus:outline-offset-0 focus:outline-none"
-            />
-          </label> */}
           <label className="bg-amber-200 p-2 rounded-md">
             Kategori:{" "}
-            <select {...register("category")} className="px-2">
+            <select {...register("category")} className="px-2 w-fit">
               <option>Pilih Kategori</option>
               <option value="Gaji">Gaji</option>
               <option value="Bonus">Bonus</option>
@@ -81,35 +88,45 @@ export default function Transaction() {
             Simpan
           </button>
         </form>
-        <div className="mt-2 bg-amber-200 p-2 rounded-sm">
-          <p className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">
-            Gaji
-          </p>
-          <p>Rekening: BRI</p>
-          <p>
-            Jumlah: <CurrentDisplay amount={5000} />{" "}
-          </p>
-        </div>
 
         <h3 className="text-2xl mt-7 mb-3">Riwayat</h3>
-        {transactions.length > 0 ? (
-          transactions.map((item) => {
-            return (
-              <div key={item.id} className="mt-2 bg-amber-200 p-2 rounded-sm">
-                <p className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">
-                  {item.category}
-                </p>
-                <p>Rekening: {item.rekening}</p>
-                <p>
-                  Jumlah: <CurrentDisplay amount={item.jumlah} />{" "}
-                </p>
-              </div>
-            );
-          })
-        ) : (
-          <p className="text-gray-500">Belum ada riwayat</p>
-        )}
+        <div className="grid grid-cols-3 gap-4">
+          {history.length > 0 ? (
+            history.map((item) => {
+              return (
+                <div key={item.id} className="mt-2 bg-amber-200 p-2 rounded-sm">
+                  <p className={getBadgeClass(item.category)}>
+                    {item.category}
+                  </p>
+                  <p>Rekening: {item.rekening}</p>
+                  <p>
+                    Jumlah: <CurrentDisplay amount={item.jumlah} />{" "}
+                  </p>
+                  <DeleteIcon
+                    className="text-red-500 cursor-pointer"
+                    onClick={() => deleteTransaction(item.id)}
+                  />
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-gray-500">Belum ada riwayat</p>
+          )}
+        </div>
       </div>
     </div>
   );
+}
+
+function getBadgeClass(category) {
+  switch (category) {
+    case "Gaji":
+      return "badge-green";
+    case "Bonus":
+      return "badge-blue";
+    case "THR":
+      return "badge-yellow";
+    default:
+      return "badge-gray";
+  }
 }
