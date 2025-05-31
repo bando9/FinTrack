@@ -75,6 +75,7 @@ export default function Transaction() {
               className="focus:outline-offset-0 focus:outline-none"
             />
           </label>
+
           <button
             className="px-3 py-1 bg-amber-100 rounded-lg w-1/2 mx-auto mt-2 cursor-pointer"
             onClick={() => {
