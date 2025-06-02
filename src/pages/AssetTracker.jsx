@@ -3,9 +3,9 @@ import AssetTable from "../components/AssetTable";
 import { rows } from "../data/rows";
 import { useForm } from "react-hook-form";
 import { cash, investType, platformInvest } from "../utils/DependentDropdown";
-// import { useState } from "react";
 import { useNotifications } from "@toolpad/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import CurrentDisplay from "../components/ui/CurrentDisplay";
 
 export default function AssetTracker() {
   const notifications = useNotifications();
@@ -14,8 +14,7 @@ export default function AssetTracker() {
   const chartData = [5957224, februari, maret, mei];
   const chartLabels = ["Januari", "Februari", "Maret", "Mei"];
 
-  // const [assetType, setAssetType] = useState("");
-  const { register, handleSubmit, watch } = useForm();
+  const { register, handleSubmit, watch, resetField } = useForm();
   const assetType = watch("assetType");
   const [assetData, setAssetData] = useState([]);
 
@@ -34,6 +33,17 @@ export default function AssetTracker() {
     e.target.reset();
   };
 
+  useEffect(() => {
+    if (assetType === "cash") {
+      resetField("platform");
+      resetField("investType");
+    } else if (assetType === "invest") {
+      resetField("cashName");
+    }
+  }, [assetType, resetField]);
+
+  const months = ["Februari", "Maret", "Mei"];
+
   return (
     <div className="m-10">
       <h1 className="mb-3 text-xl font-semibold">Asset Tracker</h1>
@@ -43,7 +53,7 @@ export default function AssetTracker() {
         <AssetChart data={chartData} labels={chartLabels} />
       </div>
 
-      <AssetTable rows={rows} />
+      <AssetTable rows={rows} months={months} />
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -51,7 +61,7 @@ export default function AssetTracker() {
       >
         <label className="bg-[#EFE4D2] p-2 rounded-md">
           Jenis Aset:{" "}
-          <select {...register("assetType")} className="px-2">
+          <select {...register("assetType")} className="px-2" required>
             <option>--Pilih Jenis Aset--</option>
             <option value="cash">Cash</option>
             <option value="invest">Invest</option>
@@ -130,14 +140,16 @@ export default function AssetTracker() {
       </form>
 
       <h2 className="text-2xl">Data</h2>
-      <ul className="grid grid-cols-4">
+      <ul className="grid grid-cols-4 gap-3">
         {assetData.map((item, index) => {
           return (
-            <div key={index} className="my-5">
+            <div key={index} className="my-5 bg-amber-200 p-2 rounded-xl">
               <li>{item.assetType}</li>
               <li>{item.cashName}</li>
               <li>{item.investType}</li>
-              <li>{item.jumlah}</li>
+              <li>
+                <CurrentDisplay amount={item.jumlah} />{" "}
+              </li>
               <li>{item.platform}</li>
             </div>
           );

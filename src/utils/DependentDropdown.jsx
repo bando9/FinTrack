@@ -10,7 +10,7 @@ export const platformInvest = [
   { id: 1, name: "Bibit" },
   { id: 2, name: "Ipot" },
   { id: 3, name: "Toko Crypto" },
-  { id: 3, name: "Pegadaian" },
+  { id: 4, name: "Pegadaian" },
 ];
 
 export const investType = [

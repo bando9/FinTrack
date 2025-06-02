@@ -10,9 +10,7 @@ import {
 } from "@mui/material";
 import CurrentDisplay from "../components/ui/CurrentDisplay";
 
-export default function AssetTable({ rows }) {
-  const months = ["Februari", "Maret", "Mei"];
-
+export default function AssetTable({ rows, months }) {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="asset table">
