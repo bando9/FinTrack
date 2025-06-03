@@ -54,6 +54,24 @@ export default function Transaction() {
 
   useEffect(() => {
     window.localStorage.setItem("transactionHistory", JSON.stringify(history));
+
+    const saved = localStorage.getItem("transactionHistory");
+    if (!saved) return 0;
+
+    try {
+      const transactions = JSON.parse(saved);
+      const totalExpense = transactions
+        .filter((item) => item.transaction == "Expense")
+        .reduce((sum, item) => sum + Number(item.jumlah), 0);
+      const totalIncome = transactions
+        .filter((item) => item.transaction == "Income")
+        .reduce((sum, item) => sum + Number(item.jumlah), 0);
+      setSumIncome(totalIncome);
+      setSumExpense(totalExpense);
+    } catch (error) {
+      console.error(error);
+      return 0;
+    }
   }, [history]);
 
   const onSubmit = (data, e) => {
