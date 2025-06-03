@@ -9,22 +9,51 @@ import { income, expense } from "../utils/DependentDropdown";
 
 export default function Transaction() {
   const notifications = useNotifications();
-
-  const [sumIncome, setSumIncome] = useState(0);
-  const [sumExpense, setSumExpense] = useState(0);
-  const [total, setTotal] = useState(0);
-
-  const { register, handleSubmit, watch, setValue } = useForm();
-  const transaction = watch("transaction");
-
   const [history, setHistory] = useState(() => {
     // Load data if it exist
     const savedData = localStorage.getItem("transactionHistory");
     return savedData ? JSON.parse(savedData) : [];
   });
 
+  const [sumIncome, setSumIncome] = useState(() => {
+    const saved = localStorage.getItem("transactionHistory");
+    if (!saved) return 0;
+
+    try {
+      const transactions = JSON.parse(saved);
+      const totalIncome = transactions
+        .filter((item) => item.transaction == "Income")
+        .reduce((sum, item) => sum + Number(item.jumlah), 0);
+      return totalIncome;
+    } catch (err) {
+      console.error("Failed to parse localStorage data: ", err);
+      return 0;
+    }
+  });
+
+  const [sumExpense, setSumExpense] = useState(() => {
+    const saved = localStorage.getItem("transactionHistory");
+    if (!saved) return 0;
+
+    try {
+      const transactions = JSON.parse(saved);
+      const totalExpense = transactions
+        .filter((item) => item.transaction == "Expense")
+        .reduce((sum, item) => sum + Number(item.jumlah), 0);
+      return totalExpense;
+    } catch (error) {
+      console.error(error);
+      return 0;
+    }
+  });
+
+  const [total, setTotal] = useState(0);
+
+  const { register, handleSubmit, watch, setValue } = useForm();
+  const transaction = watch("transaction");
+
   useEffect(() => {
-    localStorage.setItem("transactionHistory", JSON.stringify(history));
+    window.localStorage.setItem("transactionHistory", JSON.stringify(history));
   }, [history]);
 
   const onSubmit = (data, e) => {
@@ -58,19 +87,16 @@ export default function Transaction() {
     setValue("category", "default");
   }, [transaction, setValue]);
 
-  // useEffect(() => {
-  //   if (transaction === "cash") {
-  //     resetField("platform");
-  //     resetField("investType");
-  //   } else if (assetType === "invest") {
-  //     resetField("cashName");
-  //   }
-  // }, [assetType, resetField]);
+  useEffect(() => {
+    setTotal(sumIncome - sumExpense);
+  }, [sumIncome, sumExpense]);
 
   return (
     <div className="w-3/4 m-auto bg-amber-300 rounded-2xl pb-10 mt-10">
       <div className="container m-auto mt-10 p-2 w-3/4">
-        <h1 className="text-4xl underline mb-4 text-center">Transaction</h1>
+        <h1 className="text-4xl underline mb-4 text-center italic">
+          Transaction
+        </h1>
         <form
           className="flex flex-col gap-1.5"
           action="#"
@@ -176,16 +202,10 @@ export default function Transaction() {
 
         <div className="my-5 bg-amber-200 p-3">
           <p>
-            Pemasukan:{" "}
-            <span className="text-green-700">
-              <CurrentDisplay amount={sumIncome} />
-            </span>
+            Pemasukan: <CurrentDisplay amount={sumIncome} />
           </p>
           <p>
-            Pengeluaran:{" "}
-            <span className="text-red-700">
-              <CurrentDisplay amount={sumExpense} />
-            </span>
+            Pengeluaran: <CurrentDisplay amount={sumExpense} />
           </p>
           <p>
             Total: <CurrentDisplay amount={total} />
