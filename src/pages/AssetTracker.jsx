@@ -1,21 +1,16 @@
 import AssetChart from "../components/AssetChart";
-import AssetTable from "../components/AssetTable";
 import { rows } from "../data/rows";
 import { useForm } from "react-hook-form";
 import { cash, investType, platformInvest } from "../utils/DependentDropdown";
 import { useNotifications } from "@toolpad/core";
 import { useEffect, useState } from "react";
 import CurrentDisplay from "../components/ui/CurrentDisplay";
+import AssetTable from "../components/AssetTable";
 
 export default function AssetTracker() {
   const notifications = useNotifications();
 
   const { februari, maret, mei } = rows.find((row) => row.name === "Total");
-
-  const formMonth = useForm();
-  const months = ["Februari", "Maret", "Mei"];
-
-  const [monthsClone, setMonthsClone] = useState(months);
 
   const chartData = [5957224, februari, maret, mei];
   const chartLabels = ["Januari", "Februari", "Maret", "Mei"];
@@ -38,17 +33,6 @@ export default function AssetTracker() {
     e.target.reset();
   };
 
-  // const [rows, setRows] = useState();
-
-  const onSubmitMonth = (data, e) => {
-    setMonthsClone((prev) => [...prev, data.inputMonth]);
-
-    e.target.reset();
-  };
-  useEffect(() => {
-    // console.log(monthsClone);
-  }, [monthsClone]);
-
   useEffect(() => {
     if (assetType === "cash") {
       resetField("platform");
@@ -67,7 +51,7 @@ export default function AssetTracker() {
         <AssetChart data={chartData} labels={chartLabels} />
       </div>
 
-      <AssetTable rows={rows} months={monthsClone} />
+      <AssetTable />
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -150,17 +134,6 @@ export default function AssetTracker() {
         >
           Simpan
         </button>
-      </form>
-
-      <form
-        className="bg-amber-200 mt-4 flex flex-col w-1/2 p-5 mx-auto rounded-2xl"
-        onSubmit={formMonth.handleSubmit(onSubmitMonth)}
-      >
-        <label className="bg-amber-100 p-1">
-          Input Bulan:{" "}
-          <input type="text" {...formMonth.register("inputMonth")} />
-        </label>
-        <button className="cursor-pointer">Simpan bulan</button>
       </form>
 
       <h2 className="text-2xl">Data</h2>
