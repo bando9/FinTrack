@@ -9,7 +9,13 @@ import CurrentDisplay from "../components/ui/CurrentDisplay";
 
 export default function AssetTracker() {
   const notifications = useNotifications();
+
   const { februari, maret, mei } = rows.find((row) => row.name === "Total");
+
+  const formMonth = useForm();
+  const months = ["Februari", "Maret", "Mei"];
+
+  const [monthsClone, setMonthsClone] = useState(months);
 
   const chartData = [5957224, februari, maret, mei];
   const chartLabels = ["Januari", "Februari", "Maret", "Mei"];
@@ -19,7 +25,6 @@ export default function AssetTracker() {
   const [assetData, setAssetData] = useState([]);
 
   const onSubmit = (data, e) => {
-    console.log("Submitted: ", data);
     const newInputAsset = {
       id: Date.now(),
       assetType: data.assetType,
@@ -33,6 +38,17 @@ export default function AssetTracker() {
     e.target.reset();
   };
 
+  // const [rows, setRows] = useState();
+
+  const onSubmitMonth = (data, e) => {
+    setMonthsClone((prev) => [...prev, data.inputMonth]);
+
+    e.target.reset();
+  };
+  useEffect(() => {
+    // console.log(monthsClone);
+  }, [monthsClone]);
+
   useEffect(() => {
     if (assetType === "cash") {
       resetField("platform");
@@ -42,18 +58,16 @@ export default function AssetTracker() {
     }
   }, [assetType, resetField]);
 
-  const months = ["Februari", "Maret", "Mei"];
-
   return (
     <div className="m-10">
       <h1 className="mb-3 text-xl font-semibold">Asset Tracker</h1>
 
-      <div className="w-1/2">
+      <div className="w-3/4">
         <h2>Total Asset</h2>
         <AssetChart data={chartData} labels={chartLabels} />
       </div>
 
-      <AssetTable rows={rows} months={months} />
+      <AssetTable rows={rows} months={monthsClone} />
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -128,7 +142,6 @@ export default function AssetTracker() {
         <button
           className="px-3 py-1 bg-amber-100 rounded-lg w-1/2 mx-auto mt-2 cursor-pointer"
           onClick={() => {
-            console.log(notifications);
             notifications.show("Transaksi berhasil ditambahkan!", {
               severity: "success",
               autoHideDuration: 3000,
@@ -137,6 +150,17 @@ export default function AssetTracker() {
         >
           Simpan
         </button>
+      </form>
+
+      <form
+        className="bg-amber-200 mt-4 flex flex-col w-1/2 p-5 mx-auto rounded-2xl"
+        onSubmit={formMonth.handleSubmit(onSubmitMonth)}
+      >
+        <label className="bg-amber-100 p-1">
+          Input Bulan:{" "}
+          <input type="text" {...formMonth.register("inputMonth")} />
+        </label>
+        <button className="cursor-pointer">Simpan bulan</button>
       </form>
 
       <h2 className="text-2xl">Data</h2>
