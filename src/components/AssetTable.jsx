@@ -2,80 +2,116 @@ import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
 
-const columns = [
-  { field: "name", headerName: "Asset", width: 100 },
-  { field: "januari", headerName: "Januari", type: "number", width: 120 },
-  { field: "february", headerName: "Februari", type: "number", width: 120 },
-  { field: "march", headerName: "Maret", type: "number", width: 120 },
-  { field: "april", headerName: "April", type: "number", width: 120 },
-  { field: "mei", headerName: "Mei", type: "number", width: 120 },
-  { field: "june", headerName: "Juni", type: "number", width: 120 },
-  { field: "july", headerName: "Juli", type: "number", width: 120 },
-  { field: "august", headerName: "Agustus", type: "number", width: 120 },
-];
-
-const originalRows = [
-  {
-    id: 1,
-    name: "Bibit",
-    januari: 1949679,
-    february: 1115302,
-    march: 3528302,
-    april: 131213,
-    mei: 1331312,
-    june: null,
-    july: 312123,
-    august: 19,
-  },
-  {
-    id: 2,
-    name: "Ipot",
-    januari: 8824333,
-    february: 2,
-    march: 3,
-    april: 124001,
-    mei: 44233,
-    june: 312,
-    july: 3234,
-    august: 839,
-  },
-];
-
-const months = [
-  "januari",
-  "february",
-  "march",
-  "april",
-  "mei",
-  "june",
-  "july",
-  "august",
-];
-
-const calculateMonthlyTotals = (rows) => {
-  const totals = {};
-  months.forEach((month) => {
-    totals[month] = rows.reduce((acc, row) => {
-      const value = Number(row[month]);
-      return acc + (isNaN(value) || row[month] === null ? 0 : value);
-    }, 0);
-  });
-  return totals;
-};
-
-const monthlyTotals = calculateMonthlyTotals(originalRows);
-
-const totalRow = {
-  id: "total",
-  name: "Total",
-  ...monthlyTotals,
-};
-
-const rows = [...originalRows, totalRow];
+import { useForm } from "react-hook-form";
 
 export default function AssetTableForm() {
+  const { register, handleSubmit } = useForm();
+
+  const columns = [
+    { field: "name", headerName: "Asset", width: 100 },
+    { field: "Januari", headerName: "Januari", type: "number", width: 120 },
+    { field: "February", headerName: "Februari", type: "number", width: 120 },
+    {
+      field: "March",
+      headerName: "Maret",
+      type: "number",
+      width: 120,
+      editable: true,
+    },
+  ];
+
+  const originalRows = [
+    {
+      id: 1,
+      name: "Bibit",
+      Januari: 1949679,
+      February: 1115302,
+      March: 0,
+    },
+    {
+      id: 2,
+      name: "Ipot",
+      Januari: 8824333,
+      February: 2,
+      March: 0,
+    },
+  ];
+
+  // menampilkan jumlah total
+  const months = ["Januari", "February", "March"];
+  const calculateMonthlyTotals = (rows) => {
+    const totals = {};
+    months.forEach((month) => {
+      totals[month] = rows.reduce((acc, row) => {
+        const value = Number(row[month]);
+        return acc + (isNaN(value) || row[month] === null ? 0 : value);
+      }, 0);
+    });
+    return totals;
+  };
+  const monthlyTotals = calculateMonthlyTotals(originalRows);
+  const totalRow = {
+    id: "total",
+    name: "Total",
+    ...monthlyTotals,
+  };
+  const rows = [...originalRows, totalRow];
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
   return (
     <>
+      <div>
+        <h1 className="mb-5">Form</h1>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col w-1/3 bg-green-300 p-5 rounded-xl gap-1"
+        >
+          <label className="w-fit">
+            Asset:{" "}
+            <select
+              {...register("assetInput")}
+              defaultValue="default"
+              className="px-2"
+            >
+              <option value="default" hidden>
+                choose asset
+              </option>
+              <option value="Bibit">Bibit</option>
+              <option value="Ipot">Ipot</option>
+            </select>
+          </label>
+
+          <label className="w-fit">
+            Bulan:{" "}
+            <select
+              {...register("monthInput")}
+              defaultValue={"default"}
+              className="px-2"
+            >
+              <option value="default" hidden>
+                choose month
+              </option>
+              <option value="Januari">Januari</option>
+              <option value="Februari">Februari</option>
+            </select>
+          </label>
+
+          <label>
+            Jumlah:{" "}
+            <input
+              type="number"
+              {...register("totalInput")}
+              className="border-1 border-green-500 text-amber-50 rounded-sm bg-green-500"
+            />
+          </label>
+
+          <button className="bg-amber-200 p-1 rounded-md mt-2">Kirim</button>
+        </form>
+      </div>
+
       <Box sx={{ width: "100%", p: 2 }}>
         <Paper sx={{ height: 300, width: "100%" }}>
           <DataGrid
