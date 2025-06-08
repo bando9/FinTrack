@@ -3,42 +3,48 @@ import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
 
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+
+const columns = [
+  { field: "name", headerName: "Asset", width: 100 },
+  { field: "Januari", headerName: "Januari", type: "number", width: 120 },
+  { field: "February", headerName: "Februari", type: "number", width: 120 },
+  {
+    field: "March",
+    headerName: "Maret",
+    type: "number",
+    width: 120,
+  },
+];
+
+const originalRows = [
+  {
+    id: 1,
+    name: "Bibit",
+    Januari: 1949679,
+    February: 1115302,
+    March: 0,
+  },
+  {
+    id: 2,
+    name: "Ipot",
+    Januari: 8824333,
+    February: 2,
+    March: 0,
+  },
+];
+
+const months = ["Januari", "February", "March"];
 
 export default function AssetTableForm() {
   const { register, handleSubmit } = useForm();
 
-  const columns = [
-    { field: "name", headerName: "Asset", width: 100 },
-    { field: "Januari", headerName: "Januari", type: "number", width: 120 },
-    { field: "February", headerName: "Februari", type: "number", width: 120 },
-    {
-      field: "March",
-      headerName: "Maret",
-      type: "number",
-      width: 120,
-      editable: true,
-    },
-  ];
-
-  const originalRows = [
-    {
-      id: 1,
-      name: "Bibit",
-      Januari: 1949679,
-      February: 1115302,
-      March: 0,
-    },
-    {
-      id: 2,
-      name: "Ipot",
-      Januari: 8824333,
-      February: 2,
-      March: 0,
-    },
-  ];
+  const [rows, setRows] = useState();
+  const [asset, setAsset] = useState("");
+  const [month, setMonth] = useState("");
+  const [amount, setAmount] = useState("");
 
   // menampilkan jumlah total
-  const months = ["Januari", "February", "March"];
   const calculateMonthlyTotals = (rows) => {
     const totals = {};
     months.forEach((month) => {
@@ -55,10 +61,36 @@ export default function AssetTableForm() {
     name: "Total",
     ...monthlyTotals,
   };
-  const rows = [...originalRows, totalRow];
+  // const rowSum = [...originalRows, totalRow];
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = () => {
+    if (!asset || !month || !amount) return;
+    setRows((prev) => {
+      const updated = [...prev, totalRow];
+      const index = updated.findIndex((row) => row.name === asset);
+
+      if (index !== -1) {
+        updated[index] = {
+          ...updated[index],
+          [month]: Number(amount),
+        };
+      } else {
+        const newRow = {
+          id: Date.now(),
+          name: asset,
+        };
+        months.forEach((m) => {
+          newRow[m] = m === month ? Number(amount) : null;
+        });
+        updated.push(newRow);
+      }
+
+      return updated;
+    });
+
+    setAsset("");
+    setAmount("");
+    setMonth("");
   };
 
   return (
