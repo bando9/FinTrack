@@ -2,10 +2,10 @@ import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
 import { useNotifications } from "@toolpad/core";
-
 import { useForm } from "react-hook-form";
-
 import { useState, useEffect } from "react";
+
+import AssetChart from "../components/AssetChart";
 
 const columns = [
   { field: "name", headerName: "Asset", width: 100 },
@@ -34,7 +34,6 @@ const originalRows = [
     March: 0,
   },
 ];
-
 const months = ["Januari", "February", "March", "April", "May", "June", "July"];
 
 export default function AssetTableForm() {
@@ -48,7 +47,6 @@ export default function AssetTableForm() {
   });
 
   const onSubmit = (data, e) => {
-    console.log(data);
     const assetName = data.assetInput;
     const month = data.monthInput;
     const amount = Number(data.totalInput);
@@ -78,6 +76,7 @@ export default function AssetTableForm() {
 
     e.target.reset();
   };
+  // const chartData = [5957224, 7972200, 7319823, 3956075];
 
   // menampilkan jumlah total
   const calculateMonthlyTotals = (rows) => {
@@ -98,12 +97,16 @@ export default function AssetTableForm() {
   };
   const rows = [...rowsData, totalRow];
 
+  const data = months.map((month) => totalRow[month || 0]);
+
   useEffect(() => {
     window.localStorage.setItem("assetData", JSON.stringify(rowsData));
   }, [rowsData]);
 
   return (
     <>
+      <AssetChart data={data} labels={months} />
+
       <div>
         <h1 className="mb-5">Form</h1>
         <form
