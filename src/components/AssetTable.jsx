@@ -1,9 +1,11 @@
 import { DataGrid } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
 import { Box } from "@mui/material";
+import { useNotifications } from "@toolpad/core";
 
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 
 const columns = [
   { field: "name", headerName: "Asset", width: 100 },
@@ -36,11 +38,16 @@ const originalRows = [
 const months = ["Januari", "February", "March", "April", "May", "June", "July"];
 
 export default function AssetTableForm() {
-  const { register, handleSubmit, reset } = useForm();
+  const notifications = useNotifications();
 
-  const [rowsData, setRowsData] = useState(originalRows);
+  const { register, handleSubmit } = useForm();
 
-  const onSubmit = (data) => {
+  const [rowsData, setRowsData] = useState(() => {
+    const savedData = localStorage.getItem("assetData");
+    return savedData ? JSON.parse(savedData) : originalRows;
+  });
+
+  const onSubmit = (data, e) => {
     console.log(data);
     const assetName = data.assetInput;
     const month = data.monthInput;
@@ -69,7 +76,7 @@ export default function AssetTableForm() {
       }
     });
 
-    reset();
+    e.target.reset();
   };
 
   // menampilkan jumlah total
@@ -90,6 +97,10 @@ export default function AssetTableForm() {
     ...monthlyTotals,
   };
   const rows = [...rowsData, totalRow];
+
+  useEffect(() => {
+    window.localStorage.setItem("assetData", JSON.stringify(rowsData));
+  }, [rowsData]);
 
   return (
     <>
@@ -147,7 +158,17 @@ export default function AssetTableForm() {
             />
           </label>
 
-          <button className="bg-amber-200 p-1 rounded-md mt-2">Kirim</button>
+          <button
+            onClick={() => {
+              notifications.show("Transaksi berhasil ditambahkan!", {
+                severity: "success",
+                autoHideDuration: 3000,
+              });
+            }}
+            className="bg-amber-200 p-1 rounded-md mt-2"
+          >
+            Kirim
+          </button>
         </form>
       </div>
 
