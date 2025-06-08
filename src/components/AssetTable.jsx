@@ -9,12 +9,11 @@ const columns = [
   { field: "name", headerName: "Asset", width: 100 },
   { field: "Januari", headerName: "Januari", type: "number", width: 120 },
   { field: "February", headerName: "Februari", type: "number", width: 120 },
-  {
-    field: "March",
-    headerName: "Maret",
-    type: "number",
-    width: 120,
-  },
+  { field: "March", headerName: "Maret", type: "number", width: 120 },
+  { field: "April", headerName: "April", type: "number", width: 120 },
+  { field: "May", headerName: "Mei", type: "number", width: 120 },
+  { field: "June", headerName: "Juni", type: "number", width: 120 },
+  { field: "July", headerName: "Juli", type: "number", width: 120 },
 ];
 
 const originalRows = [
@@ -34,15 +33,44 @@ const originalRows = [
   },
 ];
 
-const months = ["Januari", "February", "March"];
+const months = ["Januari", "February", "March", "April", "May", "June", "July"];
 
 export default function AssetTableForm() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
 
-  const [rows, setRows] = useState();
-  const [asset, setAsset] = useState("");
-  const [month, setMonth] = useState("");
-  const [amount, setAmount] = useState("");
+  const [rowsData, setRowsData] = useState(originalRows);
+
+  const onSubmit = (data) => {
+    console.log(data);
+    const assetName = data.assetInput;
+    const month = data.monthInput;
+    const amount = Number(data.totalInput);
+
+    setRowsData((prevRows) => {
+      const existingRowIndex = prevRows.findIndex(
+        (row) => row.name === assetName
+      );
+
+      if (existingRowIndex !== -1) {
+        // update existing row asset
+        const updatedRows = [...prevRows];
+        updatedRows[existingRowIndex] = {
+          ...updatedRows[existingRowIndex],
+          [month]: amount,
+        };
+        return updatedRows;
+      } else {
+        const newRow = {
+          id: Date.now(),
+          name: assetName,
+          [month]: amount,
+        };
+        return [...prevRows, newRow];
+      }
+    });
+
+    reset();
+  };
 
   // menampilkan jumlah total
   const calculateMonthlyTotals = (rows) => {
@@ -55,43 +83,13 @@ export default function AssetTableForm() {
     });
     return totals;
   };
-  const monthlyTotals = calculateMonthlyTotals(originalRows);
+  const monthlyTotals = calculateMonthlyTotals(rowsData);
   const totalRow = {
     id: "total",
     name: "Total",
     ...monthlyTotals,
   };
-  // const rowSum = [...originalRows, totalRow];
-
-  const onSubmit = () => {
-    if (!asset || !month || !amount) return;
-    setRows((prev) => {
-      const updated = [...prev, totalRow];
-      const index = updated.findIndex((row) => row.name === asset);
-
-      if (index !== -1) {
-        updated[index] = {
-          ...updated[index],
-          [month]: Number(amount),
-        };
-      } else {
-        const newRow = {
-          id: Date.now(),
-          name: asset,
-        };
-        months.forEach((m) => {
-          newRow[m] = m === month ? Number(amount) : null;
-        });
-        updated.push(newRow);
-      }
-
-      return updated;
-    });
-
-    setAsset("");
-    setAmount("");
-    setMonth("");
-  };
+  const rows = [...rowsData, totalRow];
 
   return (
     <>
@@ -113,6 +111,10 @@ export default function AssetTableForm() {
               </option>
               <option value="Bibit">Bibit</option>
               <option value="Ipot">Ipot</option>
+              <option value="BRI">BRI</option>
+              <option value="BSI">BSI</option>
+              <option value="Jago">Bank Jago</option>
+              <option value="Gopay">Go-pay</option>
             </select>
           </label>
 
@@ -127,7 +129,12 @@ export default function AssetTableForm() {
                 choose month
               </option>
               <option value="Januari">Januari</option>
-              <option value="Februari">Februari</option>
+              <option value="February">Februari</option>
+              <option value="March">Maret</option>
+              <option value="April">April</option>
+              <option value="May">Mei</option>
+              <option value="June">Juni</option>
+              <option value="July">Juli</option>
             </select>
           </label>
 
@@ -145,7 +152,7 @@ export default function AssetTableForm() {
       </div>
 
       <Box sx={{ width: "100%", p: 2 }}>
-        <Paper sx={{ height: 300, width: "100%" }}>
+        <Paper sx={{ height: 400, width: "100%" }}>
           <DataGrid
             rows={rows}
             columns={columns}
