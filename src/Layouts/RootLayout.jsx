@@ -6,7 +6,8 @@ export default function RootLayout() {
       <NavLink to={"/"}>Home</NavLink> |{" "}
       <NavLink to={"/dashboard"}>Dashboard</NavLink> |{" "}
       <NavLink to={"/transaction"}>Transaction</NavLink> |{" "}
-      <NavLink to={"/asset"}>Asset Tracker</NavLink>
+      <NavLink to={"/asset"}>Asset Tracker</NavLink> |{" "}
+      <NavLink to={"/pay"}>Split Bill</NavLink>
       <Outlet />
     </div>
   );
